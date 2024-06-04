@@ -30,8 +30,12 @@ const sentences = [
 const init = async () => {
   const model = await use.load();
   document.querySelector('#loading').style.display = 'none';
+  
+  //se renderizan las oraciones en el html
   renderSentences();
 
+  //Se obtienen los embeddings (representaciones vectoriales) 
+  //de las oraciones usando el modelo cargado.
   const embeddings = await model.embed(sentences);
   const matrixSize = 250;
   const cellSize = matrixSize / sentences.length;
@@ -44,6 +48,9 @@ const init = async () => {
   const xLabelsContainer = document.querySelector('.x-axis');
   const yLabelsContainer = document.querySelector('.y-axis');
 
+  //se calcula la similitud entre todas las combinaciones
+  // y se va coloreando la matriz de acuerdo a la similitud
+  // y se renderizan en el canvas
   for (let i = 0; i < sentences.length; i++) {
     const labelXDom = document.createElement('div');
     const labelYDom = document.createElement('div');
@@ -74,7 +81,9 @@ const init = async () => {
 };
 const initQnA = async () => {
   const input = {
+    //preguntas
     queries: ['How are you feeling today?'],
+    //respuestas
     responses: [
       'I\'m not feeling very well.', 'Beijing is the capital of China.',
       'You have five fingers on your hand.'
@@ -93,6 +102,7 @@ const initQnA = async () => {
 init();
 initQnA();
 
+//funcion para renderizar las oraciones en el html
 const renderSentences = () => {
   sentences.forEach((sentence, i) => {
     const sentenceDom = document.createElement('div');
