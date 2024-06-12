@@ -1,91 +1,23 @@
-<!DOCTYPE >
-<meta charset="utf-8">
+<!DOCTYPE html>
 <html>
-
 <head>
+    <meta charset="utf-8">
     <title>TensorFlow.js Universal Sentence Encoder lite demo</title>
-    <style>
-        h1 {
-            margin-bottom: 35px;
-        }
-
-        #main {
-            padding-top: 30px;
-            font-family: Helvetica, sans-serif;
-            max-width: 960px;
-            min-width: 600px;
-            width: 60vw;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        #sentences-container {
-            flex: 1 1 auto;
-        }
-
-        #sentences-container>div {
-            margin-bottom: 10px;
-        }
-
-        #container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        #self-similarity-matrix {
-            position: relative;
-        }
-
-        .labels {
-            position: absolute;
-        }
-
-        .x-axis {
-            bottom: 100%;
-            width: 100%;
-            height: 20px;
-        }
-
-        .x-axis>div {
-            transform: translateX(-50%);
-        }
-
-        .y-axis {
-            right: 100%;
-            height: 100%;
-            width: 20px;
-        }
-
-        .y-axis>div {
-            transform: translateY(-50%);
-        }
-
-        .labels>div {
-            position: absolute;
-        }
-
-        #description {
-            margin-bottom: 50px;
-            line-height: 1.6;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
     <div id='main'>
         <h1>Universal Sentence Encoder lite demo</h1>
-        <div id="description">This demo is taken from the 
-            
-            <a target="_blank"
-                href="https://colab.sandbox.google.com/github/tensorflow/hub/blob/master/examples/colab/semantic_similarity_with_tf_hub_universal_encoder_lite.ipynb#scrollTo=_GSCW5QIBKVe">TensorFlow
-                Hub Universal Sentence Encoder lite colab</a>. It shows the model's ability to group sentences by
-            semantic
-            similarity usings their embeddings. The matrix on the right shows self-similarity scores (dot products)
-            between
-            the embeddings for the sentences on the left. The redder the cell, the higher the similarity score.</div>
+        <div>
+            <label><h3>Añada una nueva oración en inglés: </h3></label>
+            <input type="text" id="new-sentence" placeholder="Ingrese la oracion">
+            <button id="add-sentence-btn">Agregar</button>
+        </div>
+        <div id="sentence-loading">Analizando la oracion...</div>
         <div id="loading">
-            Loading the model...
+            Cargando el modelo...
         </div>
         <div id="container">
             <div id="sentences-container"></div>
@@ -99,7 +31,7 @@
     <div id='main'>
         <h1>Universal Sentence Encoder QnA demo</h1>
         <div id="loadingQnA">
-            Loading the model...
+            Cargando el modelo...
         </div>
         <div id="description">
             <h2>Encode Question and Answers</h2>
@@ -118,5 +50,4 @@
     </div>
     <script src="index.js"></script>
 </body>
-
 </html>
