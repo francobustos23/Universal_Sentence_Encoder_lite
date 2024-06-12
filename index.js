@@ -1,27 +1,11 @@
-/**
- * @license
- * Copyright 2019 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
 import '@tensorflow/tfjs-backend-cpu';
 import '@tensorflow/tfjs-backend-webgl';
 
 import * as use from '@tensorflow-models/universal-sentence-encoder';
 import * as tf from '@tensorflow/tfjs-core';
-import {interpolateReds} from 'd3-scale-chromatic';
+import { interpolateReds } from 'd3-scale-chromatic';
 
-const sentences = [
+let sentences = [
   'I like my phone.', 'Your cellphone looks great.', 'How old are you?',
   'What is your age?', 'An apple a day, keeps the doctors away.',
   'Eating strawberries is healthy.'
@@ -30,12 +14,12 @@ const sentences = [
 const init = async () => {
   const model = await use.load();
   document.querySelector('#loading').style.display = 'none';
-  
-  //se renderizan las oraciones en el html
-  renderSentences();
 
-  //Se obtienen los embeddings (representaciones vectoriales) 
-  //de las oraciones usando el modelo cargado.
+  renderSentences();
+  analyzeSentences(model);
+};
+
+const analyzeSentences = async (model) => {
   const embeddings = await model.embed(sentences);
   const matrixSize = 250;
   const cellSize = matrixSize / sentences.length;
@@ -48,9 +32,9 @@ const init = async () => {
   const xLabelsContainer = document.querySelector('.x-axis');
   const yLabelsContainer = document.querySelector('.y-axis');
 
-  //se calcula la similitud entre todas las combinaciones
-  // y se va coloreando la matriz de acuerdo a la similitud
-  // y se renderizan en el canvas
+  xLabelsContainer.innerHTML = '';
+  yLabelsContainer.innerHTML = '';
+
   for (let i = 0; i < sentences.length; i++) {
     const labelXDom = document.createElement('div');
     const labelYDom = document.createElement('div');
@@ -69,9 +53,9 @@ const init = async () => {
       const sentenceITranspose = false;
       const sentenceJTransepose = true;
       const score =
-          tf.matMul(
-                sentenceI, sentenceJ, sentenceITranspose, sentenceJTransepose)
-              .dataSync();
+        tf.matMul(
+          sentenceI, sentenceJ, sentenceITranspose, sentenceJTransepose)
+          .dataSync();
 
       ctx.fillStyle = interpolateReds(score);
       ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
@@ -79,11 +63,10 @@ const init = async () => {
     }
   }
 };
+
 const initQnA = async () => {
   const input = {
-    //preguntas
     queries: ['How are you feeling today?'],
-    //respuestas
     responses: [
       'I\'m not feeling very well.', 'Beijing is the capital of China.',
       'You have five fingers on your hand.'
@@ -91,22 +74,40 @@ const initQnA = async () => {
   };
   const model = await use.loadQnA();
   document.querySelector('#loadingQnA').style.display = 'none';
-  let result = model.embed(input);
+  let result = await model.embed(input);
   const dp = tf.matMul(result['queryEmbedding'], result['responseEmbedding'],
-      false, true).dataSync();
+    false, true).dataSync();
   for (let i = 0; i < dp.length; i++) {
-    document.getElementById(`answer_${i + 1}`).textContent =
-        `${dp[i]}`
+    document.getElementById(`answer_${i + 1}`).textContent = `${dp[i]}`;
   }
 };
-init();
-initQnA();
 
-//funcion para renderizar las oraciones en el html
+const addSentence = async () => {
+  const newSentence = document.getElementById('new-sentence').value;
+  if (newSentence) {
+    sentences.push(newSentence);
+    renderSentences();
+
+    document.getElementById('sentence-loading').style.display = 'block';
+
+    await init();
+
+    document.getElementById('sentence-loading').style.display = 'none';
+    alert('La oración ha sido analizada.');
+  }
+};
+
 const renderSentences = () => {
+  const container = document.querySelector('#sentences-container');
+  container.innerHTML = '';
   sentences.forEach((sentence, i) => {
     const sentenceDom = document.createElement('div');
     sentenceDom.textContent = `${i + 1}) ${sentence}`;
-    document.querySelector('#sentences-container').appendChild(sentenceDom);
+    container.appendChild(sentenceDom);
   });
 };
+
+document.getElementById('add-sentence-btn').addEventListener('click', addSentence);
+
+init();
+initQnA();
